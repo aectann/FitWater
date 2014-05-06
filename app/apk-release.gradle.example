@@ -1,0 +1,15 @@
+android {
+    signingConfigs {
+        release {
+            storeFile file('/PATH/TO/KEYSTORE')
+            storePassword 'PASSWORD'
+            keyAlias 'ALIAS'
+            keyPassword 'PASSWORD'
+        }
+    }
+
+    defaultConfig {
+        buildConfigField("String", "APP_SECRET", "SECRET_HERE")
+        buildConfigField("String", "APP_CLIENT_ID", "ID_HERE")
+    }
+}
