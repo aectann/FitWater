@@ -8,18 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.scribe.model.OAuthRequest;
-import org.scribe.model.Verb;
-import org.scribe.oauth.OAuthService;
-
-import javax.inject.Inject;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import io.github.aectann.fitwater.CredentialsStore;
 import io.github.aectann.fitwater.R;
 import io.github.aectann.fitwater.loaders.GoalLoader;
-import timber.log.Timber;
 
 /**
  * Created by aectann on 7/05/14.

@@ -7,9 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import org.scribe.model.Token;
-import org.scribe.oauth.OAuthService;
-
-import javax.inject.Inject;
 
 import io.github.aectann.fitwater.loaders.AccessTokenLoader;
 import timber.log.Timber;

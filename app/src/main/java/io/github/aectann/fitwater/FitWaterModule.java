@@ -7,7 +7,6 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import io.github.aectann.fitwater.fragments.LoginFragment;
 import io.github.aectann.fitwater.loaders.AccessTokenLoader;
 import io.github.aectann.fitwater.loaders.GoalLoader;
 import io.github.aectann.fitwater.loaders.RequestTokenLoader;

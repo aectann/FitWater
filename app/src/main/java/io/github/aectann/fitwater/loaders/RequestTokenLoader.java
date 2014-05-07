@@ -1,6 +1,5 @@
 package io.github.aectann.fitwater.loaders;
 
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 
 import org.scribe.model.Token;
