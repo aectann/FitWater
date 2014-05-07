@@ -24,7 +24,6 @@ public class IntakeFragment extends BaseFragment implements LoaderManager.Loader
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View rootView = inflater.inflate(R.layout.fragment_intake, container, false);
-    ButterKnife.inject(this, rootView);
     return rootView;
   }
 

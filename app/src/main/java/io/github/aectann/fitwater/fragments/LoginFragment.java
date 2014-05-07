@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.github.aectann.fitwater.R;
 import io.github.aectann.fitwater.loaders.RequestTokenLoader;
 
@@ -18,17 +18,33 @@ import io.github.aectann.fitwater.loaders.RequestTokenLoader;
  */
 public class LoginFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<String> {
 
+  private static final int LOADER_ID = 0;
+  private static final String AUTHORIZE_CLICKED = "authorize-clicked";
+  private static final String AUTHORIZATION_URL = "authorization-url";
+  private String authorizationUrl;
+  private boolean authorizeClicked;
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
       View rootView = inflater.inflate(R.layout.fragment_login, container, false);
-      ButterKnife.inject(this, rootView);
       return rootView;
   }
 
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
-    getLoaderManager().initLoader(0, getArguments(), this);
+    if (savedInstanceState != null) {
+      authorizeClicked = savedInstanceState.getBoolean(AUTHORIZE_CLICKED);
+      authorizationUrl = savedInstanceState.getString(AUTHORIZATION_URL);
+    }
+    getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
+  }
+
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putBoolean(AUTHORIZE_CLICKED, authorizeClicked);
+    outState.putString(AUTHORIZATION_URL, authorizationUrl);
   }
 
   @Override
@@ -38,14 +54,34 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
 
   @Override
   public void onLoadFinished(Loader<String> loader, String authorizationUrl) {
-    Intent intent = new Intent();
-    intent.setAction(Intent.ACTION_VIEW);
-    intent.setData(Uri.parse(authorizationUrl));
-    startActivityForResult(intent, 0);
+    this.authorizationUrl = authorizationUrl;
+    redirect();
+  }
+
+  private void redirect() {
+    if (this.authorizationUrl == null) {
+      Loader<Object> loader = getLoaderManager().getLoader(LOADER_ID);
+      if (!loader.isStarted()) {
+        loader.forceLoad();
+      }
+    } else if (authorizeClicked) {
+      Intent intent = new Intent();
+      intent.setAction(Intent.ACTION_VIEW);
+      intent.setData(Uri.parse(this.authorizationUrl));
+      startActivityForResult(intent, LOADER_ID);
+    }
   }
 
   @Override
   public void onLoaderReset(Loader<String> loader) {
+    this.authorizationUrl = null;
+    this.authorizeClicked = false;
+  }
+
+  @OnClick(R.id.fitbit_button)
+  public void authorize(View v){
+    this.authorizeClicked = true;
+    redirect();
   }
 
 }
