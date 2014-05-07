@@ -8,7 +8,7 @@ import io.github.aectann.fitwater.FitWater;
 /**
  * Created by aectann on 7/05/14.
  */
-public abstract class BaseAsyncTaskLoader<T extends Object> extends AsyncTaskLoader<T> {
+public abstract class BaseAsyncTaskLoader<T> extends AsyncTaskLoader<T> {
 
   T data;
 

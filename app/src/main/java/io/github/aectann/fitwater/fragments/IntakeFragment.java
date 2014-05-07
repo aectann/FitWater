@@ -8,15 +8,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 import io.github.aectann.fitwater.R;
 import io.github.aectann.fitwater.loaders.GoalLoader;
+import io.github.aectann.fitwater.loaders.IntakeLoader;
+import io.github.aectann.fitwater.model.Goal;
 
 /**
  * Created by aectann on 7/05/14.
  */
-public class IntakeFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<String> {
+public class IntakeFragment extends BaseFragment implements LoaderManager.LoaderCallbacks {
+
+  private static final int GOAL_LOADER = 0;
+  private static final int INTAKE_LOADER = 1;
 
   @InjectView(R.id.goal)
   TextView goal;
@@ -30,21 +34,35 @@ public class IntakeFragment extends BaseFragment implements LoaderManager.Loader
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
-    getLoaderManager().initLoader(0, getArguments(), this);
+    getLoaderManager().initLoader(GOAL_LOADER, getArguments(), this);
+    getLoaderManager().initLoader(INTAKE_LOADER, getArguments(), this);
   }
 
   @Override
-  public Loader<String> onCreateLoader(int id, Bundle args) {
-    return new GoalLoader(getActivity());
+  public Loader onCreateLoader(int id, Bundle args) {
+    switch (id) {
+      case GOAL_LOADER:
+        return new GoalLoader(getActivity());
+      case INTAKE_LOADER:
+        return new IntakeLoader(getActivity());
+      default:
+        return null;
+    }
   }
 
   @Override
-  public void onLoadFinished(Loader<String> loader, String data) {
-    goal.setText(data);
+  public void onLoaderReset(Loader loader) {
+
   }
 
   @Override
-  public void onLoaderReset(Loader<String> loader) {
-
+  public void onLoadFinished(Loader loader, Object data) {
+    switch (loader.getId()) {
+      case GOAL_LOADER:
+        Goal g = (Goal) data;
+        String goalString = String.valueOf(g.getGoal());
+        goal.setText(goalString);
+        break;
+    }
   }
 }
