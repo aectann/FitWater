@@ -1,40 +1,54 @@
 package io.github.aectann.fitwater;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import org.scribe.model.Token;
-import org.scribe.oauth.OAuthService;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import timber.log.Timber;
+import io.github.aectann.fitwater.fragments.IntakeFragment;
+import io.github.aectann.fitwater.fragments.LoginFragment;
 
 
 public class MainActivity extends BaseActivity {
 
+  private static final String TOKEN_AVAILABLE = "token-available";
 
   @Inject
-  OAuthService service;
+  CredentialsStore credentialsStore;
 
-  @Inject
-  RequestTokenHolder tokenHolder;
+  private boolean tokenAvailable;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
-    ButterKnife.inject(this);
+    setContentView(R.layout.activity_data);
+    Token accessToken = credentialsStore.getAccessToken();
+    if (savedInstanceState == null) {
+      Fragment fragment = accessToken == null ? new LoginFragment() : new IntakeFragment();
+      getFragmentManager().beginTransaction()
+              .add(R.id.container, fragment)
+              .commit();
+    } else {
+      tokenAvailable = savedInstanceState.getBoolean(TOKEN_AVAILABLE);
+      if (tokenAvailable ^ (accessToken != null)) {
+        Fragment fragment = accessToken == null ? new LoginFragment() : new IntakeFragment();
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+      }
+    }
+    tokenAvailable = accessToken != null;
   }
 
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putBoolean(TOKEN_AVAILABLE, tokenAvailable);
+  }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -55,27 +69,4 @@ public class MainActivity extends BaseActivity {
     return super.onOptionsItemSelected(item);
   }
 
-  @OnClick(R.id.fitbit_button)
-  public void fitbit(View v) {
-    new AsyncTask<Void, Void, Token>() {
-
-      @Override
-      protected Token doInBackground(Void... params) {
-        Token reqToken = service.getRequestToken();
-        Timber.d(String.valueOf(reqToken));
-        return reqToken;
-      }
-
-      @Override
-      protected void onPostExecute(Token token) {
-        tokenHolder.setRequestToken(token);
-        String authorizationUrl = service.getAuthorizationUrl(token);
-        Timber.d(authorizationUrl);
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(authorizationUrl));
-        startActivityForResult(intent, 0);
-      }
-    }.execute();
-  }
 }

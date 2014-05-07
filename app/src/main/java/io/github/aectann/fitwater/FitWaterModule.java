@@ -7,14 +7,23 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.github.aectann.fitwater.fragments.LoginFragment;
+import io.github.aectann.fitwater.loaders.GoalLoader;
+import io.github.aectann.fitwater.loaders.RequestTokenLoader;
 
 /**
  * Created by aectann on 4/05/14.
  */
 @Module(
-        injects = {MainActivity.class, OAuthCallbackActivity.class, RequestTokenHolder.class, OAuthService.class}
+        injects = {RequestTokenLoader.class, GoalLoader.class, MainActivity.class, OAuthCallbackActivity.class, CredentialsStore.class, OAuthService.class}
 )
 public class FitWaterModule {
+
+  private final FitWater fitwater;
+
+  public FitWaterModule(FitWater fitWater) {
+    this.fitwater = fitWater;
+  }
 
   @Provides
   @Singleton
@@ -28,7 +37,7 @@ public class FitWaterModule {
 
   @Provides
   @Singleton
-  RequestTokenHolder provideRequestTokenHolder() {
-    return new RequestTokenHolder();
+  CredentialsStore provideRequestTokenHolder() {
+    return new CredentialsStore(fitwater);
   }
 }

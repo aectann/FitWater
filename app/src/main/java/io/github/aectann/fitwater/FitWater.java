@@ -14,8 +14,8 @@ public class FitWater extends Application {
 
   @Override
   public void onCreate() {
-    objectGraph = ObjectGraph.create(new FitWaterModule());
-    objectGraph.get(RequestTokenHolder.class);
+    objectGraph = ObjectGraph.create(new FitWaterModule(this));
+    objectGraph.get(CredentialsStore.class);
     Timber.plant(new Timber.DebugTree());
   }
 

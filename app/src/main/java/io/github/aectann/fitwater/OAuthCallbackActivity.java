@@ -1,6 +1,6 @@
 package io.github.aectann.fitwater;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,7 +24,7 @@ public class OAuthCallbackActivity extends BaseActivity {
   OAuthService service;
 
   @Inject
-  RequestTokenHolder tokenHolder;
+  CredentialsStore tokenHolder;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -38,16 +38,15 @@ public class OAuthCallbackActivity extends BaseActivity {
       @Override
       protected Token doInBackground(Void... params) {
         Token accessToken = service.getAccessToken(tokenHolder.getRequestToken(), new Verifier(oauth_verifier));
-        OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.fitbit.com/1/user/-/foods/log/water/goal.json");
-        service.signRequest(accessToken, request);
-        String body = request.send().getBody();
-        Timber.d("Goal: " + body);
         return accessToken;
       }
 
       @Override
       protected void onPostExecute(Token token) {
         Timber.d("Access token: " + token.getToken());
+        tokenHolder.setRequestToken(null);
+        tokenHolder.setAccessToken(token);
+        startActivity(new Intent(OAuthCallbackActivity.this, MainActivity.class));
       }
     }.execute();
 
