@@ -27,21 +27,23 @@ public class MainActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_data);
     Token accessToken = credentialsStore.getAccessToken();
+    boolean showLogin = accessToken == null;
     if (savedInstanceState == null) {
-      Fragment fragment = accessToken == null ? new LoginFragment() : new IntakeFragment();
-      getFragmentManager().beginTransaction()
-              .add(R.id.container, fragment)
-              .commit();
+      replaceFragment(showLogin);
     } else {
       tokenAvailable = savedInstanceState.getBoolean(TOKEN_AVAILABLE);
       if (tokenAvailable ^ (accessToken != null)) {
-        Fragment fragment = accessToken == null ? new LoginFragment() : new IntakeFragment();
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment)
-                .commit();
+        replaceFragment(showLogin);
       }
     }
     tokenAvailable = accessToken != null;
+  }
+
+  private void replaceFragment(boolean showLogin) {
+    Fragment fragment = showLogin ? new LoginFragment() : new IntakeFragment();
+    getFragmentManager().beginTransaction()
+            .replace(R.id.container, fragment)
+            .commit();
   }
 
   @Override
@@ -63,7 +65,9 @@ public class MainActivity extends BaseActivity {
     // automatically handle clicks on the Home/Up button, so long
     // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
-    if (id == R.id.action_settings) {
+    if (id == R.id.action_log_out) {
+      credentialsStore.setAccessToken(null);
+      replaceFragment(true);
       return true;
     }
     return super.onOptionsItemSelected(item);

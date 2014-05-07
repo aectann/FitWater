@@ -28,13 +28,10 @@ public class RequestTokenLoader extends BaseAsyncTaskLoader<String> {
 
   @Override
   public String loadInBackground() {
-    Token requestToken = tokenHolder.getRequestToken();
-    if (requestToken == null) {
-      Timber.d("Loading request token.");
-      requestToken = service.getRequestToken();
-      Timber.d(String.valueOf(requestToken));
-      tokenHolder.setRequestToken(requestToken);
-    }
+    Timber.d("Loading request token.");
+    Token requestToken = service.getRequestToken();
+    Timber.d(String.valueOf(requestToken));
+    tokenHolder.setRequestToken(requestToken);
     return data = service.getAuthorizationUrl(requestToken);
   }
 

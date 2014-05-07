@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.github.aectann.fitwater.fragments.LoginFragment;
+import io.github.aectann.fitwater.loaders.AccessTokenLoader;
 import io.github.aectann.fitwater.loaders.GoalLoader;
 import io.github.aectann.fitwater.loaders.RequestTokenLoader;
 
@@ -15,7 +16,7 @@ import io.github.aectann.fitwater.loaders.RequestTokenLoader;
  * Created by aectann on 4/05/14.
  */
 @Module(
-        injects = {RequestTokenLoader.class, GoalLoader.class, MainActivity.class, OAuthCallbackActivity.class, CredentialsStore.class, OAuthService.class}
+        injects = {AccessTokenLoader.class, RequestTokenLoader.class, GoalLoader.class, MainActivity.class, OAuthCallbackActivity.class, CredentialsStore.class, OAuthService.class}
 )
 public class FitWaterModule {
 
