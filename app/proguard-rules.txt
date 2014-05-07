@@ -35,6 +35,10 @@
   @javax.inject.* <init>(...);
 }
 
+-dontwarn butterknife.internal.**
+-keep class **$$ViewInjector { *; }
+-keepnames class * { @butterknife.InjectView *;}
+
 
 # Keep the generated classes by dagger-compile
 -keep class **$$ModuleAdapter
