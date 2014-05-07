@@ -35,6 +35,7 @@ public class OAuthCallbackActivity extends BaseActivity implements LoaderManager
   @Override
   public void onLoadFinished(Loader<Token> loader, Token data) {
     startActivity(new Intent(OAuthCallbackActivity.this, MainActivity.class));
+    finish();
   }
 
   @Override
