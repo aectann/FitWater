@@ -1,5 +1,8 @@
 package io.github.aectann.fitwater;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.oauth.OAuthService;
 
@@ -16,7 +19,7 @@ import io.github.aectann.fitwater.loaders.RequestTokenLoader;
  * Created by aectann on 4/05/14.
  */
 @Module(
-        injects = {AccessTokenLoader.class, RequestTokenLoader.class, GoalLoader.class, IntakeLoader.class, MainActivity.class, OAuthCallbackActivity.class, CredentialsStore.class, OAuthService.class}
+        injects = {Gson.class, AccessTokenLoader.class, RequestTokenLoader.class, GoalLoader.class, IntakeLoader.class, MainActivity.class, OAuthCallbackActivity.class, CredentialsStore.class, OAuthService.class}
 )
 public class FitWaterModule {
 
@@ -40,6 +43,12 @@ public class FitWaterModule {
   @Singleton
   CredentialsStore provideCredentialStore() {
     return new CredentialsStore(fitwater);
+  }
+
+  @Provides
+  @Singleton
+  Gson provideGson() {
+    return new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
   }
 
 }

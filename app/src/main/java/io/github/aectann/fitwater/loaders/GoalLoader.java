@@ -2,9 +2,6 @@ package io.github.aectann.fitwater.loaders;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.model.OAuthRequest;
@@ -30,7 +27,6 @@ public class GoalLoader extends BaseAsyncTaskLoader<Goal> {
     try {
       String body = request.send().getBody();
       JSONObject goal = new JSONObject(body).getJSONObject("goal");
-      Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
       Goal g = gson.fromJson(goal.toString(), Goal.class);
       return data = g;
     } catch (JSONException e) {

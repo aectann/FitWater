@@ -3,12 +3,12 @@ package io.github.aectann.fitwater.loaders;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
-import org.json.JSONException;
+import com.google.gson.Gson;
+
 import org.scribe.oauth.OAuthService;
 
 import javax.inject.Inject;
 
-import hugo.weaving.DebugLog;
 import io.github.aectann.fitwater.CredentialsStore;
 import io.github.aectann.fitwater.FitWater;
 
@@ -24,6 +24,9 @@ public abstract class BaseAsyncTaskLoader<T> extends AsyncTaskLoader<T> {
 
   @Inject
   CredentialsStore credentialsStore;
+
+  @Inject
+  Gson gson;
 
   public BaseAsyncTaskLoader(Context context) {
     super(context);

@@ -2,12 +2,13 @@ package io.github.aectann.fitwater.loaders;
 
 import android.content.Context;
 
-import org.scribe.oauth.OAuthService;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Verb;
 
-import javax.inject.Inject;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import hugo.weaving.DebugLog;
-import io.github.aectann.fitwater.CredentialsStore;
 import io.github.aectann.fitwater.model.Intake;
 
 /**
@@ -22,7 +23,10 @@ public class IntakeLoader extends BaseAsyncTaskLoader<Intake> {
   @Override
   @DebugLog
   public Intake loadInBackground() {
-    //TODO make request..
-    return data = new Intake();
+    String dateString = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+    OAuthRequest request = new OAuthRequest(Verb.GET, String.format("http://api.fitbit.com/1/user/-/foods/log/water/date/%s.json", dateString));
+    service.signRequest(credentialsStore.getAccessToken(), request);
+    Intake intake = gson.fromJson(request.send().getBody(), Intake.class);
+    return data = intake;
   }
 }

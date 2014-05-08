@@ -4,12 +4,8 @@ import android.content.Context;
 
 import org.scribe.model.Token;
 import org.scribe.model.Verifier;
-import org.scribe.oauth.OAuthService;
-
-import javax.inject.Inject;
 
 import hugo.weaving.DebugLog;
-import io.github.aectann.fitwater.CredentialsStore;
 
 /**
  * Created by aectann on 7/05/14.

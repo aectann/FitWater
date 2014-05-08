@@ -31,4 +31,12 @@ public class Goal {
   public void setStartDate(Date startDate) {
     this.startDate = startDate;
   }
+
+  @Override
+  public String toString() {
+    return "Goal{" +
+            "goal=" + goal +
+            ", startDate=" + startDate +
+            '}';
+  }
 }
