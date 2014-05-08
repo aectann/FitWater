@@ -3,6 +3,9 @@ package io.github.aectann.fitwater.loaders;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
+import org.json.JSONException;
+
+import hugo.weaving.DebugLog;
 import io.github.aectann.fitwater.FitWater;
 
 /**
@@ -32,5 +35,9 @@ public abstract class BaseAsyncTaskLoader<T> extends AsyncTaskLoader<T> {
   protected void onStopLoading() {
     super.onStopLoading();
     cancelLoad();
+  }
+
+  @DebugLog
+  void logError(JSONException e) {
   }
 }

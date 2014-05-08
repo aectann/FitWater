@@ -11,8 +11,6 @@ import org.scribe.model.OAuthRequest;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
-import java.util.Date;
-
 import javax.inject.Inject;
 
 import hugo.weaving.DebugLog;
@@ -46,14 +44,10 @@ public class GoalLoader extends BaseAsyncTaskLoader<Goal> {
       Goal g = gson.fromJson(goal.toString(), Goal.class);
       return data = g;
     } catch (JSONException e) {
-      error(e);
+      logError(e);
       cancelLoad();
     }
     return null;
-  }
-
-  @DebugLog
-  void error(JSONException e) {
   }
 
 }
