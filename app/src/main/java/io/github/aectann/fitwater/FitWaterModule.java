@@ -1,7 +1,6 @@
 package io.github.aectann.fitwater;
 
 import org.scribe.builder.ServiceBuilder;
-import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
 import javax.inject.Singleton;

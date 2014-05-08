@@ -7,8 +7,8 @@ import org.scribe.oauth.OAuthService;
 
 import javax.inject.Inject;
 
+import hugo.weaving.DebugLog;
 import io.github.aectann.fitwater.CredentialsStore;
-import timber.log.Timber;
 
 /**
  * Created by aectann on 7/05/14.
@@ -26,10 +26,9 @@ public class RequestTokenLoader extends BaseAsyncTaskLoader<String> {
   }
 
   @Override
+  @DebugLog
   public String loadInBackground() {
-    Timber.d("Loading request token.");
     Token requestToken = service.getRequestToken();
-    Timber.d(String.valueOf(requestToken));
     tokenHolder.setRequestToken(requestToken);
     return data = service.getAuthorizationUrl(requestToken);
   }

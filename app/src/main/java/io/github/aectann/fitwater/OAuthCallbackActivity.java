@@ -9,7 +9,6 @@ import android.os.Bundle;
 import org.scribe.model.Token;
 
 import io.github.aectann.fitwater.loaders.AccessTokenLoader;
-import timber.log.Timber;
 
 /**
  * Created by aectann on 4/05/14.
@@ -22,7 +21,6 @@ public class OAuthCallbackActivity extends BaseActivity implements LoaderManager
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Uri data = getIntent().getData();
-    Timber.d("OAuth: " + data);
     oauth_verifier = data.getQueryParameter("oauth_verifier");
     getLoaderManager().initLoader(0, getIntent().getExtras(), this);
   }

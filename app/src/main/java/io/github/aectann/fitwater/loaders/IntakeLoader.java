@@ -1,13 +1,12 @@
 package io.github.aectann.fitwater.loaders;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Loader;
 
 import org.scribe.oauth.OAuthService;
 
 import javax.inject.Inject;
 
+import hugo.weaving.DebugLog;
 import io.github.aectann.fitwater.CredentialsStore;
 import io.github.aectann.fitwater.model.Intake;
 
@@ -27,6 +26,7 @@ public class IntakeLoader extends BaseAsyncTaskLoader<Intake> {
   }
 
   @Override
+  @DebugLog
   public Intake loadInBackground() {
     //TODO make request..
     return data = new Intake();
