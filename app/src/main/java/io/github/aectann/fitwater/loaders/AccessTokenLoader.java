@@ -18,12 +18,6 @@ public class AccessTokenLoader extends BaseAsyncTaskLoader<Token> {
 
   private final String verifier;
 
-  @Inject
-  OAuthService service;
-
-  @Inject
-  CredentialsStore tokenHolder;
-
   @DebugLog
   public AccessTokenLoader(Context context, String verifier) {
     super(context);
@@ -33,9 +27,9 @@ public class AccessTokenLoader extends BaseAsyncTaskLoader<Token> {
   @Override
   @DebugLog
   public Token loadInBackground() {
-    Token accessToken = service.getAccessToken(tokenHolder.getRequestToken(), new Verifier(verifier));
-    tokenHolder.setRequestToken(null);
-    tokenHolder.setAccessToken(accessToken);
+    Token accessToken = service.getAccessToken(credentialsStore.getRequestToken(), new Verifier(verifier));
+    credentialsStore.setRequestToken(null);
+    credentialsStore.setAccessToken(accessToken);
     return data = accessToken;
   }
 

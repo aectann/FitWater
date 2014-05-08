@@ -9,25 +9,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Verb;
-import org.scribe.oauth.OAuthService;
-
-import javax.inject.Inject;
 
 import hugo.weaving.DebugLog;
-import io.github.aectann.fitwater.CredentialsStore;
 import io.github.aectann.fitwater.model.Goal;
+import timber.log.Timber;
 
 /**
  * Created by aectann on 7/05/14.
  */
 public class GoalLoader extends BaseAsyncTaskLoader<Goal> {
-
-  @Inject
-  CredentialsStore credentialsStore;
-
-  @Inject
-  OAuthService service;
-
   public GoalLoader(Context context) {
     super(context);
   }
@@ -44,7 +34,7 @@ public class GoalLoader extends BaseAsyncTaskLoader<Goal> {
       Goal g = gson.fromJson(goal.toString(), Goal.class);
       return data = g;
     } catch (JSONException e) {
-      logError(e);
+      Timber.e(e, "Failed to parse response.");
       cancelLoad();
     }
     return null;

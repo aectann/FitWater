@@ -15,12 +15,6 @@ import io.github.aectann.fitwater.model.Intake;
  */
 public class IntakeLoader extends BaseAsyncTaskLoader<Intake> {
 
-  @Inject
-  CredentialsStore credentialsStore;
-
-  @Inject
-  OAuthService service;
-
   public IntakeLoader(Context context) {
     super(context);
   }

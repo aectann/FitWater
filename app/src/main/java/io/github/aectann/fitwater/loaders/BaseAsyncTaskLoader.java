@@ -4,8 +4,12 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 
 import org.json.JSONException;
+import org.scribe.oauth.OAuthService;
+
+import javax.inject.Inject;
 
 import hugo.weaving.DebugLog;
+import io.github.aectann.fitwater.CredentialsStore;
 import io.github.aectann.fitwater.FitWater;
 
 /**
@@ -14,6 +18,12 @@ import io.github.aectann.fitwater.FitWater;
 public abstract class BaseAsyncTaskLoader<T> extends AsyncTaskLoader<T> {
 
   T data;
+
+  @Inject
+  OAuthService service;
+
+  @Inject
+  CredentialsStore credentialsStore;
 
   public BaseAsyncTaskLoader(Context context) {
     super(context);
@@ -37,7 +47,4 @@ public abstract class BaseAsyncTaskLoader<T> extends AsyncTaskLoader<T> {
     cancelLoad();
   }
 
-  @DebugLog
-  void logError(JSONException e) {
-  }
 }
