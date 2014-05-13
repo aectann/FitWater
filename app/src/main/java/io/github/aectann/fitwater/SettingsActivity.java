@@ -93,7 +93,7 @@ public class SettingsActivity extends Activity {
         Preference preference = getPreferenceScreen().getPreference(i);
         String key = preference.getKey();
         if (key != null && key.endsWith(AUTO_SUMMARY_SUFFIX)) {
-          bindPreferenceSummaryToValue(preference);
+          summaryUpdater.onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(preference.getKey(), ""));
         }
       }
     }
@@ -118,8 +118,5 @@ public class SettingsActivity extends Activity {
       PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(autoSummaryListener);
     }
 
-    private void bindPreferenceSummaryToValue(final Preference preference) {
-      summaryUpdater.onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(preference.getKey(), ""));
-    }
   }
 }
