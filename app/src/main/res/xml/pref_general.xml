@@ -1,0 +1,35 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <CheckBoxPreference
+        android:key="reminder_state"
+        android:title="@string/pref_reminder_state_title"
+        android:summary="@string/pref_reminder_state_summary"/>
+
+    <ListPreference
+        android:entries="@array/pref_reminder_frequency_titles"
+        android:entryValues="@array/pref_reminder_frequency_values"
+        android:title="@string/pref_reminder_frequency_title"
+        android:dependency="reminder_state"
+        android:layout="?android:preferenceLayoutChild"
+        android:key="reminder_frequency_auto_summary"
+        android:persistent="true">
+
+    </ListPreference>
+
+
+    <PreferenceCategory
+        android:title="@string/pref_category_fitbit">
+
+        <PreferenceScreen
+            android:title="@string/pref_fitbit_title"
+            android:summary="@string/pref_fitbit_summary">
+
+            <intent android:action="io.github.aectann.fitwater.LOGOUT"/>
+
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

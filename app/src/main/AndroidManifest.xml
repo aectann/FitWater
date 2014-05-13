@@ -19,6 +19,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="io.github.aectann.fitwater.LOGOUT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <activity android:name="io.github.aectann.fitwater.OAuthCallbackActivity" >
             <intent-filter>
@@ -29,6 +34,14 @@
 
                 <data android:scheme="fitwater" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="io.github.aectann.fitwater.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="io.github.aectann.fitwater.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="MainActivity" />
         </activity>
     </application>
 
