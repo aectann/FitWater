@@ -3,7 +3,7 @@
 
 
     <CheckBoxPreference
-        android:key="reminder_state"
+        android:key="@string/pref_reminder_state"
         android:title="@string/pref_reminder_state_title"
         android:summary="@string/pref_reminder_state_summary"/>
 
@@ -11,12 +11,15 @@
         android:entries="@array/pref_reminder_frequency_titles"
         android:entryValues="@array/pref_reminder_frequency_values"
         android:title="@string/pref_reminder_frequency_title"
-        android:dependency="reminder_state"
+        android:dependency="@string/pref_reminder_state"
         android:layout="?android:preferenceLayoutChild"
-        android:key="reminder_frequency_auto_summary"
-        android:persistent="true">
+        android:key="@string/pref_reminder_frequency"  />
 
-    </ListPreference>
+    <RingtonePreference android:key="@string/pref_reminder_sound"
+        android:dependency="@string/pref_reminder_state"
+        android:layout="?android:preferenceLayoutChild"
+        android:title="@string/pref_reminder_sound_title"
+        ></RingtonePreference>
 
 
     <PreferenceCategory
