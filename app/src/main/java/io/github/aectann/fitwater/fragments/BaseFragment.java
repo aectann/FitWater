@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import butterknife.ButterKnife;
+import io.github.aectann.fitwater.FitWater;
 
 /**
  * Created by aectann on 7/05/14.
@@ -14,6 +15,7 @@ public class BaseFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    ((FitWater)getActivity().getApplication()).inject(this);
   }
 
   @Override

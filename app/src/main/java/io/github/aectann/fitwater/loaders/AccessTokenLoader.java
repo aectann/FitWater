@@ -1,11 +1,14 @@
 package io.github.aectann.fitwater.loaders;
 
+import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 
 import org.scribe.model.Token;
 import org.scribe.model.Verifier;
 
 import hugo.weaving.DebugLog;
+import io.github.aectann.fitwater.OAuthCallbackActivity;
 
 /**
  * Created by aectann on 7/05/14.
@@ -15,9 +18,10 @@ public class AccessTokenLoader extends BaseAsyncTaskLoader<Token> {
   private final String verifier;
 
   @DebugLog
-  public AccessTokenLoader(Context context, String verifier) {
+  public AccessTokenLoader(Activity context) {
     super(context);
-    this.verifier = verifier;
+    Uri data = context.getIntent().getData();
+    this.verifier = data.getQueryParameter("oauth_verifier");
   }
 
   @Override

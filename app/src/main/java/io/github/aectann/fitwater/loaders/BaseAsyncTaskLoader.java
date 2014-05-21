@@ -50,4 +50,9 @@ public abstract class BaseAsyncTaskLoader<T> extends AsyncTaskLoader<T> {
     cancelLoad();
   }
 
+  @Override
+  protected void onReset() {
+    super.onReset();
+    data = null;
+  }
 }

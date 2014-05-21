@@ -9,7 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import butterknife.OnClick;
+import io.github.aectann.fitwater.CredentialsStore;
 import io.github.aectann.fitwater.R;
 import io.github.aectann.fitwater.loaders.RequestTokenLoader;
 
@@ -23,6 +26,9 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
   private static final String AUTHORIZATION_URL = "authorization-url";
   private String authorizationUrl;
   private boolean authorizeClicked;
+
+  @Inject
+  CredentialsStore credentialsStore;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,6 +44,12 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
       authorizationUrl = savedInstanceState.getString(AUTHORIZATION_URL);
     }
     getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    getLoaderManager().getLoader(LOADER_ID).reset();
   }
 
   @Override
@@ -76,6 +88,7 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
   public void onLoaderReset(Loader<String> loader) {
     this.authorizationUrl = null;
     this.authorizeClicked = false;
+    this.credentialsStore.setAccessToken(null);
   }
 
   @OnClick(R.id.fitbit_button)

@@ -15,19 +15,15 @@ import io.github.aectann.fitwater.loaders.AccessTokenLoader;
  */
 public class OAuthCallbackActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Token> {
 
-  private String oauth_verifier;
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    Uri data = getIntent().getData();
-    oauth_verifier = data.getQueryParameter("oauth_verifier");
     getLoaderManager().initLoader(0, getIntent().getExtras(), this);
   }
 
   @Override
   public Loader<Token> onCreateLoader(int id, Bundle args) {
-    return new AccessTokenLoader(this, oauth_verifier);
+    return new AccessTokenLoader(this);
   }
 
   @Override
