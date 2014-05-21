@@ -18,6 +18,7 @@ public class OAuthCallbackActivity extends BaseActivity implements LoaderManager
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_oauth_callback);
     getLoaderManager().initLoader(0, getIntent().getExtras(), this);
   }
 

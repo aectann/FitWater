@@ -29,7 +29,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".OAuthCallbackActivity">
+            android:name=".OAuthCallbackActivity"
+            android:label="@string/title_activity_oauth_callback">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
 

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import javax.inject.Inject;
 
+import butterknife.InjectView;
 import butterknife.OnClick;
 import io.github.aectann.fitwater.CredentialsStore;
 import io.github.aectann.fitwater.R;
@@ -29,6 +30,9 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
 
   @Inject
   CredentialsStore credentialsStore;
+
+  @InjectView(R.id.progress)
+  View progress;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,6 +71,7 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
   @Override
   public void onLoadFinished(Loader<String> loader, String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
+    progress.setVisibility(View.INVISIBLE);
     redirect();
   }
 
@@ -76,6 +81,7 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
       if (!loader.isStarted()) {
         loader.forceLoad();
       }
+      progress.setVisibility(View.VISIBLE);
     } else if (authorizeClicked) {
       Intent intent = new Intent();
       intent.setAction(Intent.ACTION_VIEW);
