@@ -43,7 +43,7 @@ public class Intake {
             '}';
   }
 
-  static class Summary {
+  public static class Summary {
 
     private double water;
 
