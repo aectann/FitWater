@@ -40,5 +40,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.+'
     compile 'com.squareup.dagger:dagger:1.2.+'
     compile 'com.jakewharton.timber:timber:2.2.+'
+    compile 'com.netflix.rxjava:rxjava-core:0.18.+'
+    compile 'com.netflix.rxjava:rxjava-android:0.18.+'
 }
 apply from: 'apk-release.gradle'

@@ -1,5 +1,6 @@
 package io.github.aectann.fitwater.fragments;
 
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Loader;
 import android.graphics.Color;
@@ -14,11 +15,15 @@ import android.widget.TextView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import hugo.weaving.DebugLog;
 import io.github.aectann.fitwater.R;
 import io.github.aectann.fitwater.loaders.GoalLoader;
 import io.github.aectann.fitwater.loaders.IntakeLoader;
 import io.github.aectann.fitwater.model.Goal;
 import io.github.aectann.fitwater.model.Intake;
+import io.github.aectann.fitwater.rx.GlobalUiEvents;
+import io.github.aectann.fitwater.rx.ObserverAdapter;
+import rx.Subscription;
 
 /**
  * Created by aectann on 7/05/14.
@@ -33,6 +38,7 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
   private Intake intake;
   private IntakeAdapter intakeAdapter;
   private View todaysIntakeHeader;
+  private Subscription refreshSubscription;
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -41,6 +47,27 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
     listView.setDivider(new ColorDrawable(Color.TRANSPARENT));
     listView.addHeaderView(goalView = createOrBindGoalView(goalView), null, false);
     listView.addHeaderView(todaysIntakeHeader = createOrBindTodaysIntakeHeader(todaysIntakeHeader), null, false);
+  }
+
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    refreshSubscription = GlobalUiEvents.REFRESH.subscribe(new ObserverAdapter<GlobalUiEvents>() {
+      @Override
+      @DebugLog
+      public void onNext(GlobalUiEvents globalUiEvents) {
+        getLoaderManager().restartLoader(GOAL_LOADER, null, IntakeFragment.this);
+        getLoaderManager().restartLoader(INTAKE_LOADER, null, IntakeFragment.this);
+        refreshViews(GOAL_LOADER, null);
+        refreshViews(INTAKE_LOADER, null);
+      }
+    });
+  }
+
+  @Override
+  public void onDetach() {
+    refreshSubscription.unsubscribe();
+    super.onDetach();
   }
 
   private View createOrBindTodaysIntakeHeader(View convertView) {
@@ -102,12 +129,16 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
 
   @Override
   public void onLoaderReset(Loader loader) {
-
+    refreshViews(loader.getId(), null);
   }
 
   @Override
   public void onLoadFinished(Loader loader, Object data) {
-    switch (loader.getId()) {
+    refreshViews(loader.getId(), data);
+  }
+
+  private void refreshViews(int loader, Object data) {
+    switch (loader) {
       case GOAL_LOADER:
         goal = (Goal) data;
         createOrBindGoalView(goalView);

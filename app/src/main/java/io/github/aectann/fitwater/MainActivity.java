@@ -12,6 +12,7 @@ import javax.inject.Inject;
 
 import io.github.aectann.fitwater.fragments.IntakeFragment;
 import io.github.aectann.fitwater.fragments.LoginFragment;
+import io.github.aectann.fitwater.rx.GlobalUiEvents;
 
 
 public class MainActivity extends BaseActivity {
@@ -67,6 +68,8 @@ public class MainActivity extends BaseActivity {
     if (id == R.id.action_settings) {
       startActivity(new Intent(this, SettingsActivity.class));
       return true;
+    } else if (id == R.id.refresh) {
+      GlobalUiEvents.REFRESH.fire();
     }
     return super.onOptionsItemSelected(item);
   }
