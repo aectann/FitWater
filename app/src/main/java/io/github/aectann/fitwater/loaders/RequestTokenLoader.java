@@ -17,10 +17,14 @@ public class RequestTokenLoader extends BaseAsyncTaskLoader<String> {
 
   @Override
   @DebugLog
-  public String loadInBackground() {
-    Token requestToken = service.getRequestToken();
-    credentialsStore.setRequestToken(requestToken);
-    return data = service.getAuthorizationUrl(requestToken);
+  public RequestResult<String> loadInBackground() {
+    try {
+      Token requestToken = service.getRequestToken();
+      credentialsStore.setRequestToken(requestToken);
+      return data = new RequestResult<>(service.getAuthorizationUrl(requestToken), null);
+    } catch (Exception e) {
+      return new RequestResult<>(null, "Failed to load request token.");
+    }
   }
 
 }

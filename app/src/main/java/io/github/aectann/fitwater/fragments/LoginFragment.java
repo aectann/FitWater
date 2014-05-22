@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import javax.inject.Inject;
 
@@ -15,12 +16,13 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import io.github.aectann.fitwater.CredentialsStore;
 import io.github.aectann.fitwater.R;
+import io.github.aectann.fitwater.loaders.RequestResult;
 import io.github.aectann.fitwater.loaders.RequestTokenLoader;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class LoginFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<String> {
+public class LoginFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<RequestResult<String>> {
 
   private static final int LOADER_ID = 0;
   private static final String AUTHORIZE_CLICKED = "authorize-clicked";
@@ -64,15 +66,20 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
   }
 
   @Override
-  public Loader<String> onCreateLoader(int id, Bundle args) {
+  public Loader<RequestResult<String>> onCreateLoader(int id, Bundle args) {
     return new RequestTokenLoader(getActivity().getApplicationContext());
   }
 
   @Override
-  public void onLoadFinished(Loader<String> loader, String authorizationUrl) {
-    this.authorizationUrl = authorizationUrl;
-    progress.setVisibility(View.INVISIBLE);
-    redirect();
+  public void onLoadFinished(Loader<RequestResult<String>> loader, RequestResult<String> authorizationUrl) {
+    if (authorizationUrl.hasError()) {
+      progress.setVisibility(View.INVISIBLE);
+      Toast.makeText(getActivity(), authorizationUrl.getErrorMessage(), Toast.LENGTH_SHORT).show();
+    } else {
+      this.authorizationUrl = authorizationUrl.getData();
+      progress.setVisibility(View.INVISIBLE);
+      redirect();
+    }
   }
 
   private void redirect() {
@@ -91,7 +98,7 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
   }
 
   @Override
-  public void onLoaderReset(Loader<String> loader) {
+  public void onLoaderReset(Loader<RequestResult<String>> loader) {
     this.authorizationUrl = null;
     this.authorizeClicked = false;
     this.credentialsStore.setAccessToken(null);

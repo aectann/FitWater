@@ -19,6 +19,7 @@ import hugo.weaving.DebugLog;
 import io.github.aectann.fitwater.R;
 import io.github.aectann.fitwater.loaders.GoalLoader;
 import io.github.aectann.fitwater.loaders.IntakeLoader;
+import io.github.aectann.fitwater.loaders.RequestResult;
 import io.github.aectann.fitwater.model.Goal;
 import io.github.aectann.fitwater.model.Intake;
 import io.github.aectann.fitwater.rx.GlobalUiEvents;
@@ -39,6 +40,7 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
   private IntakeAdapter intakeAdapter;
   private View todaysIntakeHeader;
   private Subscription refreshSubscription;
+  private String errorMessage;
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -56,6 +58,7 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
       @Override
       @DebugLog
       public void onNext(GlobalUiEvents globalUiEvents) {
+        errorMessage = null;
         getLoaderManager().restartLoader(GOAL_LOADER, null, IntakeFragment.this);
         getLoaderManager().restartLoader(INTAKE_LOADER, null, IntakeFragment.this);
         refreshViews(GOAL_LOADER, null);
@@ -76,13 +79,17 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
       IntakeHeaderViewHolder.attach(convertView);
     }
     IntakeHeaderViewHolder viewHolder = (IntakeHeaderViewHolder) convertView.getTag();
-    if (intake == null) {
-      viewHolder.progress.setVisibility(View.VISIBLE);
-      viewHolder.label.setVisibility(View.INVISIBLE);
-    } else {
+    if (errorMessage != null) {
       viewHolder.progress.setVisibility(View.INVISIBLE);
-      viewHolder.label.setText(getString(R.string.todays_intake, (int) intake.getSummary().getWater()));
-      viewHolder.label.setVisibility(View.VISIBLE);
+    } else {
+      if (intake == null) {
+        viewHolder.progress.setVisibility(View.VISIBLE);
+        viewHolder.label.setVisibility(View.INVISIBLE);
+      } else {
+        viewHolder.progress.setVisibility(View.INVISIBLE);
+        viewHolder.label.setText(getString(R.string.todays_intake, (int) intake.getSummary().getWater()));
+        viewHolder.label.setVisibility(View.VISIBLE);
+      }
     }
     return convertView;
   }
@@ -93,15 +100,21 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
       GoalViewHolder.attach(convertView);
     }
     GoalViewHolder viewHolder = (GoalViewHolder) convertView.getTag();
-    if (goal == null) {
-      viewHolder.progress.setVisibility(View.VISIBLE);
-      viewHolder.goalLabel.setText(R.string.goal_loading_label);
-      viewHolder.goalValue.setVisibility(View.INVISIBLE);
-    } else {
+
+    if (errorMessage != null) {
       viewHolder.progress.setVisibility(View.INVISIBLE);
-      viewHolder.goalLabel.setText(R.string.goal_label);
-      viewHolder.goalValue.setText(getString(R.string.goal_value, goal.getGoal()));
-      viewHolder.goalValue.setVisibility(View.VISIBLE);
+      viewHolder.goalLabel.setText(errorMessage);
+    } else {
+      if (goal == null) {
+        viewHolder.progress.setVisibility(View.VISIBLE);
+        viewHolder.goalLabel.setText(R.string.goal_loading_label);
+        viewHolder.goalValue.setVisibility(View.INVISIBLE);
+      } else {
+        viewHolder.progress.setVisibility(View.INVISIBLE);
+        viewHolder.goalLabel.setText(R.string.goal_label);
+        viewHolder.goalValue.setText(getString(R.string.goal_value, goal.getGoal()));
+        viewHolder.goalValue.setVisibility(View.VISIBLE);
+      }
     }
     return convertView;
   }
@@ -129,12 +142,19 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
 
   @Override
   public void onLoaderReset(Loader loader) {
+    errorMessage = null;
     refreshViews(loader.getId(), null);
   }
 
   @Override
   public void onLoadFinished(Loader loader, Object data) {
-    refreshViews(loader.getId(), data);
+    RequestResult requestResult = (RequestResult) data;
+    if (requestResult.hasError()) {
+      this.errorMessage = ((RequestResult) data).getErrorMessage();
+    } else {
+      this.errorMessage = null;
+    }
+    refreshViews(loader.getId(), requestResult.getData());
   }
 
   private void refreshViews(int loader, Object data) {

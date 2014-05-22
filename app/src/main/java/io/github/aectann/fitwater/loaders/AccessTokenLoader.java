@@ -26,11 +26,15 @@ public class AccessTokenLoader extends BaseAsyncTaskLoader<Token> {
 
   @Override
   @DebugLog
-  public Token loadInBackground() {
-    Token accessToken = service.getAccessToken(credentialsStore.getRequestToken(), new Verifier(verifier));
-    credentialsStore.setRequestToken(null);
-    credentialsStore.setAccessToken(accessToken);
-    return data = accessToken;
+  public RequestResult<Token> loadInBackground() {
+    try {
+      Token accessToken = service.getAccessToken(credentialsStore.getRequestToken(), new Verifier(verifier));
+      credentialsStore.setRequestToken(null);
+      credentialsStore.setAccessToken(accessToken);
+      return data = new RequestResult<>(accessToken);
+    } catch (Exception e) {
+      return new RequestResult<>("Failed to load access token.");
+    }
   }
 
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
 import org.scribe.model.Verb;
 
 import hugo.weaving.DebugLog;
@@ -21,19 +22,20 @@ public class GoalLoader extends BaseAsyncTaskLoader<Goal> {
 
   @Override
   @DebugLog
-  public Goal loadInBackground() {
+  public RequestResult<Goal> loadInBackground() {
     OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.fitbit.com/1/user/-/foods/log/water/goal.json");
     service.signRequest(credentialsStore.getAccessToken(), request);
     try {
-      String body = request.send().getBody();
+      Response response = request.send();
+      String body = response.getBody();
       JSONObject goal = new JSONObject(body).getJSONObject("goal");
       Goal g = gson.fromJson(goal.toString(), Goal.class);
-      return data = g;
-    } catch (JSONException e) {
+      data = new RequestResult<>(g);
+      return data;
+    } catch (Exception e) {
       Timber.e(e, "Failed to parse response.");
-      cancelLoad();
+      return new RequestResult<>("Failed to load goal.");
     }
-    return null;
   }
 
 }

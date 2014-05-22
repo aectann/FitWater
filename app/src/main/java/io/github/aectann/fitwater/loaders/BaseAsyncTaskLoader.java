@@ -15,9 +15,9 @@ import io.github.aectann.fitwater.FitWater;
 /**
  * Created by aectann on 7/05/14.
  */
-public abstract class BaseAsyncTaskLoader<T> extends AsyncTaskLoader<T> {
+public abstract class BaseAsyncTaskLoader<T> extends AsyncTaskLoader<RequestResult<T>> {
 
-  T data;
+  RequestResult<T> data;
 
   @Inject
   OAuthService service;

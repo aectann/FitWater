@@ -22,11 +22,16 @@ public class IntakeLoader extends BaseAsyncTaskLoader<Intake> {
 
   @Override
   @DebugLog
-  public Intake loadInBackground() {
-    String dateString = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-    OAuthRequest request = new OAuthRequest(Verb.GET, String.format("http://api.fitbit.com/1/user/-/foods/log/water/date/%s.json", dateString));
-    service.signRequest(credentialsStore.getAccessToken(), request);
-    Intake intake = gson.fromJson(request.send().getBody(), Intake.class);
-    return data = intake;
+  public RequestResult<Intake> loadInBackground() {
+    try {
+      String dateString = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+      OAuthRequest request = new OAuthRequest(Verb.GET, String.format("http://api.fitbit.com/1/user/-/foods/log/water/date/%s.json", dateString));
+      service.signRequest(credentialsStore.getAccessToken(), request);
+      Intake intake = gson.fromJson(request.send().getBody(), Intake.class);
+      data = new RequestResult<>(intake);
+      return data;
+    } catch (Exception e) {
+      return new RequestResult<>("Failed to load intake.");
+    }
   }
 }
