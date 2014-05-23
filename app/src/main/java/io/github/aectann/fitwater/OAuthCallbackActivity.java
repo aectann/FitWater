@@ -1,44 +1,60 @@
 package io.github.aectann.fitwater;
 
-import android.app.LoaderManager;
 import android.content.Intent;
-import android.content.Loader;
-import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import org.scribe.model.Token;
 
-import io.github.aectann.fitwater.loaders.AccessTokenLoader;
-import io.github.aectann.fitwater.loaders.RequestResult;
+import javax.inject.Inject;
+
+import io.github.aectann.fitwater.io.FitbitOAuthService;
+import rx.Observer;
+import rx.Subscription;
+import timber.log.Timber;
 
 /**
  * Created by aectann on 4/05/14.
  */
-public class OAuthCallbackActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<RequestResult<Token>> {
+public class OAuthCallbackActivity extends BaseActivity {
+
+  @Inject
+  FitbitOAuthService fitbitOAuthService;
+
+  @Inject
+  CredentialsStore credentialsStore;
+
+  private Subscription accessTokenSubscription;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_oauth_callback);
-    getLoaderManager().initLoader(0, getIntent().getExtras(), this);
+    String oauthVerifier = getIntent().getData().getQueryParameter("oauth_verifier");
+    accessTokenSubscription = fitbitOAuthService.getAccessToken(oauthVerifier, new Observer<Token>() {
+      @Override
+      public void onCompleted() {
+        startActivity(new Intent(OAuthCallbackActivity.this, MainActivity.class));
+        finish();
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        Timber.e(throwable, "Failed to fetch access token.");
+      }
+
+      @Override
+      public void onNext(Token token) {
+        credentialsStore.setAccessToken(token);
+        credentialsStore.setRequestToken(null);
+      }
+    });
   }
 
   @Override
-  public Loader<RequestResult<Token>> onCreateLoader(int id, Bundle args) {
-    return new AccessTokenLoader(this);
-  }
-
-  @Override
-  public void onLoadFinished(Loader<RequestResult<Token>> loader, RequestResult<Token> data) {
-    if (data.hasError()) {
-      Toast.makeText(this, data.getErrorMessage(), Toast.LENGTH_LONG).show();
+  public void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+    if (accessTokenSubscription != null) {
+      accessTokenSubscription.unsubscribe();
     }
-    startActivity(new Intent(OAuthCallbackActivity.this, MainActivity.class));
-    finish();
-  }
-
-  @Override
-  public void onLoaderReset(Loader<RequestResult<Token>> loader) {
   }
 }

@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import hugo.weaving.DebugLog;
 import io.github.aectann.fitwater.CredentialsStore;
 import retrofit.client.Header;
@@ -21,12 +24,14 @@ import retrofit.client.Response;
 /**
  * Created by aectann on 22/05/14.
  */
+@Singleton
 public class OAuthClient extends OkClient {
 
   OAuthService oAuthService;
 
   CredentialsStore credentialsStore;
 
+  @Inject
   public OAuthClient(OkHttpClient client, OAuthService oAuthService, CredentialsStore credentialsStore) {
     super(client);
     this.oAuthService = oAuthService;

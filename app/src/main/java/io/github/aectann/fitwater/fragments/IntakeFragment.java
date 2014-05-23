@@ -70,12 +70,8 @@ public class IntakeFragment extends BaseListFragment {
       @DebugLog
       public void onNext(GlobalUiEvents globalUiEvents) {
         errorMessage = null;
-        if (goalSubscription == null) {
-          goalSubscription = fetchGoal();
-        }
-        if (intakeSubscription == null) {
-          intakeSubscription = fetchIntake();
-        }
+        fetchGoal();
+        fetchIntake();
         refreshViews(GOAL_LOADER, null);
         refreshViews(INTAKE_LOADER, null);
       }
@@ -85,7 +81,12 @@ public class IntakeFragment extends BaseListFragment {
   @Override
   public void onDetach() {
     refreshSubscription.unsubscribe();
-    goalSubscription.unsubscribe();
+    if (goalSubscription != null) {
+      goalSubscription.unsubscribe();
+    }
+    if (intakeSubscription != null) {
+      intakeSubscription.unsubscribe();
+    }
     super.onDetach();
   }
 
@@ -140,13 +141,16 @@ public class IntakeFragment extends BaseListFragment {
     super.onActivityCreated(savedInstanceState);
     intakeAdapter = new IntakeAdapter();
     setListAdapter(intakeAdapter);
-    goalSubscription = fetchGoal();
-    intakeSubscription = fetchIntake();
+    fetchGoal();
+    fetchIntake();
   }
 
-  private Subscription fetchIntake() {
+  private void fetchIntake() {
+    if (intakeSubscription != null) {
+      return;
+    }
     String dateString = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-    return fitbitService.getIntake(dateString).observeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Intake>() {
+    intakeSubscription = fitbitService.getIntake(dateString).observeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Intake>() {
       @Override
       public void onCompleted() {
         unsubscribe();
@@ -173,8 +177,11 @@ public class IntakeFragment extends BaseListFragment {
     });
   }
 
-  private Subscription fetchGoal() {
-    return fitbitService.getGoal().observeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<GoalResponse>() {
+  private void fetchGoal() {
+    if (goalSubscription != null) {
+      return;
+    }
+    goalSubscription = fitbitService.getGoal().observeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<GoalResponse>() {
       @Override
       public void onCompleted() {
         unsubscribe();

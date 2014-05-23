@@ -12,6 +12,7 @@ import javax.inject.Inject;
 
 import io.github.aectann.fitwater.fragments.IntakeFragment;
 import io.github.aectann.fitwater.fragments.LoginFragment;
+import io.github.aectann.fitwater.io.UserLoggedIn;
 import io.github.aectann.fitwater.rx.GlobalUiEvents;
 
 
@@ -20,29 +21,25 @@ public class MainActivity extends BaseActivity {
   private static final String TOKEN_AVAILABLE = "token-available";
 
   @Inject
-  CredentialsStore credentialsStore;
-
-  private boolean tokenAvailable;
+  @UserLoggedIn
+  boolean tokenAvailable;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_data);
-    Token accessToken = credentialsStore.getAccessToken();
-    boolean showLogin = accessToken == null;
     if (savedInstanceState == null) {
-      replaceFragment(showLogin);
+      replaceFragment();
     } else {
-      tokenAvailable = savedInstanceState.getBoolean(TOKEN_AVAILABLE);
-      if (tokenAvailable ^ (accessToken != null)) {
-        replaceFragment(showLogin);
+      boolean prevTokenAvailable = savedInstanceState.getBoolean(TOKEN_AVAILABLE);
+      if (tokenAvailable ^ prevTokenAvailable) {
+        replaceFragment();
       }
     }
-    tokenAvailable = accessToken != null;
   }
 
-  private void replaceFragment(boolean showLogin) {
-    Fragment fragment = showLogin ? new LoginFragment() : new IntakeFragment();
+  private void replaceFragment() {
+    Fragment fragment = tokenAvailable ? new IntakeFragment() : new LoginFragment();
     getFragmentManager().beginTransaction()
             .replace(R.id.container, fragment)
             .commit();

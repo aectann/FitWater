@@ -1,12 +1,13 @@
 package io.github.aectann.fitwater.io;
 
 import android.app.Application;
-import android.net.Uri;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.HttpResponseCache;
 import com.squareup.okhttp.OkHttpClient;
 
+import org.scribe.builder.ServiceBuilder;
 import org.scribe.oauth.OAuthService;
 
 import java.io.File;
@@ -16,16 +17,23 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import io.github.aectann.fitwater.CredentialsStore;
-import io.github.aectann.fitwater.FitBitApi;
+import io.github.aectann.fitwater.BuildConfig;
+import io.github.aectann.fitwater.OAuthCallbackActivity;
+import io.github.aectann.fitwater.fragments.IntakeFragment;
+import io.github.aectann.fitwater.fragments.LoginFragment;
 import retrofit.Endpoint;
 import retrofit.Endpoints;
 import retrofit.RestAdapter;
-import retrofit.client.Client;
 import retrofit.converter.GsonConverter;
 import timber.log.Timber;
 
 @Module(
+    injects = {
+            OAuthClient.class,
+            OAuthCallbackActivity.class,
+            LoginFragment.class,
+            IntakeFragment.class
+    },
     complete = false,
     library = true
 )
@@ -39,12 +47,7 @@ public final class ApiModule {
   }
 
   @Provides @Singleton
-  Client provideClient(OkHttpClient client, OAuthService oAuthService, CredentialsStore credentialsStore) {
-    return new OAuthClient(client, oAuthService, credentialsStore);
-  }
-
-  @Provides @Singleton
-  RestAdapter provideRestAdapter(Endpoint endpoint, Client client, Gson gson) {
+  RestAdapter provideRestAdapter(Endpoint endpoint, OAuthClient client, Gson gson) {
     return new RestAdapter.Builder() //
         .setClient(client) //
         .setEndpoint(endpoint)
@@ -71,7 +74,22 @@ public final class ApiModule {
     } catch (IOException e) {
       Timber.e(e, "Unable to install disk cache.");
     }
-
     return client;
+  }
+
+  @Provides
+  @Singleton
+  OAuthService provideOAuthService() {
+    return new ServiceBuilder().provider(FitBitApi.class).
+            apiKey(BuildConfig.APP_CLIENT_ID).
+            apiSecret(BuildConfig.APP_SECRET).
+            callback("fitwater://oauth_callback").
+            build();
+  }
+
+  @Provides
+  @Singleton
+  Gson provideGson() {
+    return new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
   }
 }

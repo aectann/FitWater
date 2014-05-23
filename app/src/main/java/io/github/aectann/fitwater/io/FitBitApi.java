@@ -1,4 +1,4 @@
-package io.github.aectann.fitwater;
+package io.github.aectann.fitwater.io;
 
 import org.scribe.builder.api.DefaultApi10a;
 import org.scribe.model.Token;

@@ -1,8 +1,6 @@
 package io.github.aectann.fitwater.fragments;
 
-import android.app.LoaderManager;
 import android.content.Intent;
-import android.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,19 +8,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import org.scribe.model.Token;
+
 import javax.inject.Inject;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
 import io.github.aectann.fitwater.CredentialsStore;
 import io.github.aectann.fitwater.R;
-import io.github.aectann.fitwater.loaders.RequestResult;
-import io.github.aectann.fitwater.loaders.RequestTokenLoader;
+import io.github.aectann.fitwater.io.FitbitOAuthService;
+import rx.Observer;
+import rx.Subscription;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class LoginFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<RequestResult<String>> {
+public class LoginFragment extends BaseFragment {
 
   private static final int LOADER_ID = 0;
   private static final String AUTHORIZE_CLICKED = "authorize-clicked";
@@ -33,8 +34,14 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
   @Inject
   CredentialsStore credentialsStore;
 
+  @Inject
+  FitbitOAuthService fitbitOAuthService;
+
+
   @InjectView(R.id.progress)
   View progress;
+
+  private Subscription requestTokenSubscription;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,13 +56,42 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
       authorizeClicked = savedInstanceState.getBoolean(AUTHORIZE_CLICKED);
       authorizationUrl = savedInstanceState.getString(AUTHORIZATION_URL);
     }
-    getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
+    getRequestToken();
+  }
+
+  private void getRequestToken() {
+    if (requestTokenSubscription != null) {
+      return;
+    }
+    requestTokenSubscription = fitbitOAuthService.getRequestToken(new Observer<Token>() {
+      @Override
+      public void onCompleted() {
+        requestTokenSubscription.unsubscribe();
+        requestTokenSubscription = null;
+        progress.setVisibility(View.INVISIBLE);
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        authorizationUrl = null;
+        Toast.makeText(getActivity(), "Failed to connect to Fitbit.com. Check your network connection.", Toast.LENGTH_SHORT).show();
+      }
+
+      @Override
+      public void onNext(Token token) {
+        credentialsStore.setRequestToken(token);
+        authorizationUrl = fitbitOAuthService.getAuthorizationUrl(token);
+        redirect();
+      }
+    });
   }
 
   @Override
-  public void onResume() {
-    super.onResume();
-    getLoaderManager().getLoader(LOADER_ID).reset();
+  public void onDetach() {
+    super.onDetach();
+    if (requestTokenSubscription != null) {
+      requestTokenSubscription.unsubscribe();
+    }
   }
 
   @Override
@@ -65,43 +101,16 @@ public class LoginFragment extends BaseFragment implements LoaderManager.LoaderC
     outState.putString(AUTHORIZATION_URL, authorizationUrl);
   }
 
-  @Override
-  public Loader<RequestResult<String>> onCreateLoader(int id, Bundle args) {
-    return new RequestTokenLoader(getActivity().getApplicationContext());
-  }
-
-  @Override
-  public void onLoadFinished(Loader<RequestResult<String>> loader, RequestResult<String> authorizationUrl) {
-    if (authorizationUrl.hasError()) {
-      progress.setVisibility(View.INVISIBLE);
-      Toast.makeText(getActivity(), authorizationUrl.getErrorMessage(), Toast.LENGTH_SHORT).show();
-    } else {
-      this.authorizationUrl = authorizationUrl.getData();
-      progress.setVisibility(View.INVISIBLE);
-      redirect();
-    }
-  }
-
   private void redirect() {
     if (this.authorizationUrl == null) {
-      Loader<Object> loader = getLoaderManager().getLoader(LOADER_ID);
-      if (!loader.isStarted()) {
-        loader.forceLoad();
-      }
       progress.setVisibility(View.VISIBLE);
+      getRequestToken();
     } else if (authorizeClicked) {
       Intent intent = new Intent();
       intent.setAction(Intent.ACTION_VIEW);
       intent.setData(Uri.parse(this.authorizationUrl));
       startActivityForResult(intent, LOADER_ID);
     }
-  }
-
-  @Override
-  public void onLoaderReset(Loader<RequestResult<String>> loader) {
-    this.authorizationUrl = null;
-    this.authorizeClicked = false;
-    this.credentialsStore.setAccessToken(null);
   }
 
   @OnClick(R.id.fitbit_button)
