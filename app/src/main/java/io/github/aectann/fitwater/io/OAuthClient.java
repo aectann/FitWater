@@ -2,11 +2,13 @@ package io.github.aectann.fitwater.io;
 
 import com.squareup.okhttp.OkHttpClient;
 
+import org.apache.http.HttpStatus;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ import retrofit.client.Header;
 import retrofit.client.OkClient;
 import retrofit.client.Request;
 import retrofit.client.Response;
+import timber.log.Timber;
 
 /**
  * Created by aectann on 22/05/14.
@@ -46,7 +49,12 @@ public class OAuthClient extends OkClient {
       oAuthService.signRequest(credentialsStore.getAccessToken(), oAuthRequest);
     }
     request = toRetrofitRequest(request, oAuthRequest);
-    return super.execute(request);
+    Response response = super.execute(request);
+    if (response.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+      credentialsStore.setAccessToken(null);
+      Timber.d("Request returned with unauthorized status. Access token cleared.");
+    }
+    return response;
   }
 
   private Request toRetrofitRequest(Request request, OAuthRequest oAuthRequest) {
