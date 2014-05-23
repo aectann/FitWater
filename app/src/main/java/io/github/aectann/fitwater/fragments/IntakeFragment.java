@@ -1,8 +1,6 @@
 package io.github.aectann.fitwater.fragments;
 
 import android.app.Activity;
-import android.app.LoaderManager;
-import android.content.Loader;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -13,23 +11,30 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import hugo.weaving.DebugLog;
 import io.github.aectann.fitwater.R;
-import io.github.aectann.fitwater.loaders.GoalLoader;
-import io.github.aectann.fitwater.loaders.IntakeLoader;
-import io.github.aectann.fitwater.loaders.RequestResult;
+import io.github.aectann.fitwater.io.FitbitService;
 import io.github.aectann.fitwater.model.Goal;
+import io.github.aectann.fitwater.model.GoalResponse;
 import io.github.aectann.fitwater.model.Intake;
 import io.github.aectann.fitwater.rx.GlobalUiEvents;
 import io.github.aectann.fitwater.rx.ObserverAdapter;
+import rx.Observer;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by aectann on 7/05/14.
  */
-public class IntakeFragment extends BaseListFragment implements LoaderManager.LoaderCallbacks {
+public class IntakeFragment extends BaseListFragment {
 
   private static final int GOAL_LOADER = 0;
   private static final int INTAKE_LOADER = 1;
@@ -41,6 +46,12 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
   private View todaysIntakeHeader;
   private Subscription refreshSubscription;
   private String errorMessage;
+
+  @Inject
+  FitbitService fitbitService;
+
+  private Subscription goalSubscription;
+  private Subscription intakeSubscription;
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -59,8 +70,12 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
       @DebugLog
       public void onNext(GlobalUiEvents globalUiEvents) {
         errorMessage = null;
-        getLoaderManager().restartLoader(GOAL_LOADER, null, IntakeFragment.this);
-        getLoaderManager().restartLoader(INTAKE_LOADER, null, IntakeFragment.this);
+        if (goalSubscription == null) {
+          goalSubscription = fetchGoal();
+        }
+        if (intakeSubscription == null) {
+          intakeSubscription = fetchIntake();
+        }
         refreshViews(GOAL_LOADER, null);
         refreshViews(INTAKE_LOADER, null);
       }
@@ -70,6 +85,7 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
   @Override
   public void onDetach() {
     refreshSubscription.unsubscribe();
+    goalSubscription.unsubscribe();
     super.onDetach();
   }
 
@@ -122,39 +138,67 @@ public class IntakeFragment extends BaseListFragment implements LoaderManager.Lo
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
-    getLoaderManager().initLoader(GOAL_LOADER, getArguments(), this);
-    getLoaderManager().initLoader(INTAKE_LOADER, getArguments(), this);
     intakeAdapter = new IntakeAdapter();
     setListAdapter(intakeAdapter);
+    goalSubscription = fetchGoal();
+    intakeSubscription = fetchIntake();
   }
 
-  @Override
-  public Loader onCreateLoader(int id, Bundle args) {
-    switch (id) {
-      case GOAL_LOADER:
-        return new GoalLoader(getActivity());
-      case INTAKE_LOADER:
-        return new IntakeLoader(getActivity());
-      default:
-        return null;
-    }
+  private Subscription fetchIntake() {
+    String dateString = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+    return fitbitService.getIntake(dateString).observeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Intake>() {
+      @Override
+      public void onCompleted() {
+        unsubscribe();
+      }
+
+      private void unsubscribe() {
+        intakeSubscription.unsubscribe();
+        intakeSubscription = null;
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        errorMessage = "Failed to load intake.";
+        intake = null;
+        createOrBindTodaysIntakeHeader(todaysIntakeHeader);
+        unsubscribe();
+      }
+
+      @Override
+      public void onNext(Intake intake) {
+        IntakeFragment.this.intake = intake;
+        createOrBindTodaysIntakeHeader(todaysIntakeHeader);
+      }
+    });
   }
 
-  @Override
-  public void onLoaderReset(Loader loader) {
-    errorMessage = null;
-    refreshViews(loader.getId(), null);
-  }
+  private Subscription fetchGoal() {
+    return fitbitService.getGoal().observeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<GoalResponse>() {
+      @Override
+      public void onCompleted() {
+        unsubscribe();
+      }
 
-  @Override
-  public void onLoadFinished(Loader loader, Object data) {
-    RequestResult requestResult = (RequestResult) data;
-    if (requestResult.hasError()) {
-      this.errorMessage = ((RequestResult) data).getErrorMessage();
-    } else {
-      this.errorMessage = null;
-    }
-    refreshViews(loader.getId(), requestResult.getData());
+      private void unsubscribe() {
+        goalSubscription.unsubscribe();
+        goalSubscription = null;
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        errorMessage = "Failed to load goal.";
+        goal = null;
+        createOrBindGoalView(goalView);
+        unsubscribe();
+      }
+
+      @Override
+      public void onNext(GoalResponse goalResponse) {
+        goal = goalResponse.getGoal();
+        createOrBindGoalView(goalView);
+      }
+    });
   }
 
   private void refreshViews(int loader, Object data) {

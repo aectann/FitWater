@@ -3,6 +3,7 @@ package io.github.aectann.fitwater;
 import android.app.Application;
 
 import dagger.ObjectGraph;
+import dagger.internal.Modules;
 import timber.log.Timber;
 
 /**

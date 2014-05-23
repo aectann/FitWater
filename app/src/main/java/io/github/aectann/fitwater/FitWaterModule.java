@@ -1,5 +1,7 @@
 package io.github.aectann.fitwater;
 
+import android.app.Application;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -13,9 +15,8 @@ import dagger.Provides;
 import io.github.aectann.fitwater.fragments.IntakeFragment;
 import io.github.aectann.fitwater.fragments.LoginFragment;
 import io.github.aectann.fitwater.fragments.SettingsFragment;
+import io.github.aectann.fitwater.io.ApiModule;
 import io.github.aectann.fitwater.loaders.AccessTokenLoader;
-import io.github.aectann.fitwater.loaders.GoalLoader;
-import io.github.aectann.fitwater.loaders.IntakeLoader;
 import io.github.aectann.fitwater.loaders.RequestTokenLoader;
 
 /**
@@ -25,10 +26,8 @@ import io.github.aectann.fitwater.loaders.RequestTokenLoader;
         injects = {
                     AccessTokenLoader.class,
                     CredentialsStore.class,
-                    GoalLoader.class,
                     Gson.class,
                     IntakeFragment.class,
-                    IntakeLoader.class,
                     LoginFragment.class,
                     LogoutActivity.class,
                     MainActivity.class,
@@ -36,6 +35,9 @@ import io.github.aectann.fitwater.loaders.RequestTokenLoader;
                     OAuthService.class,
                     RequestTokenLoader.class,
                     SettingsFragment.class
+        },
+        includes = {
+                ApiModule.class
         }
 
 )
@@ -69,4 +71,9 @@ public class FitWaterModule {
     return new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
   }
 
+  @Provides
+  @Singleton
+  Application provideApplication() {
+    return fitwater;
+  }
 }

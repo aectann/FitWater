@@ -8,6 +8,8 @@ import org.scribe.model.Token;
  */
 public class FitBitApi extends DefaultApi10a {
 
+  public static final String FITBIT_API_URL = "http://api.fitbit.com/1";
+
   @Override
   public String getRequestTokenEndpoint() {
     return "https://api.fitbit.com/oauth/request_token";
