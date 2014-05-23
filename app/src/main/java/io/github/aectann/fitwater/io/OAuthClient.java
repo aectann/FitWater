@@ -2,13 +2,12 @@ package io.github.aectann.fitwater.io;
 
 import com.squareup.okhttp.OkHttpClient;
 
-import org.apache.http.HttpStatus;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
 import java.io.IOException;
-import java.net.URLConnection;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class OAuthClient extends OkClient {
     }
     request = toRetrofitRequest(request, oAuthRequest);
     Response response = super.execute(request);
-    if (response.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+    if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
       credentialsStore.setAccessToken(null);
       Timber.d("Request returned with unauthorized status. Access token cleared.");
     }
