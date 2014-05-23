@@ -61,12 +61,6 @@ public class FitWaterModule {
 
   @Provides
   @Singleton
-  CredentialsStore provideCredentialStore() {
-    return new CredentialsStore(fitwater);
-  }
-
-  @Provides
-  @Singleton
   Gson provideGson() {
     return new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
   }

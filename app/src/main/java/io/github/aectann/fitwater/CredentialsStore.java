@@ -1,13 +1,18 @@
 package io.github.aectann.fitwater;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import org.scribe.model.Token;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Created by aectann on 4/05/14.
  */
+@Singleton
 public class CredentialsStore {
 
   private static final String REQUEST_TOKEN = "request-token";
@@ -19,7 +24,8 @@ public class CredentialsStore {
   private Token requestToken;
   private Token accessToken;
 
-  public CredentialsStore(Context context) {
+  @Inject
+  public CredentialsStore(Application context) {
     this.context = context.getApplicationContext();
   }
 
