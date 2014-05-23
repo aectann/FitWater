@@ -6,7 +6,7 @@ import org.scribe.model.Token;
 /**
  * Created by aectann on 4/05/14.
  */
-public class FitBitApi extends DefaultApi10a {
+public class FitBitOAuthApi extends DefaultApi10a {
 
   public static final String FITBIT_API_URL = "http://api.fitbit.com/1";
 

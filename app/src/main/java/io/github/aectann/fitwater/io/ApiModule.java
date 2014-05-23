@@ -43,7 +43,7 @@ public final class ApiModule {
 
   @Provides @Singleton
   Endpoint provideEndpoint() {
-    return Endpoints.newFixedEndpoint(FitBitApi.FITBIT_API_URL);
+    return Endpoints.newFixedEndpoint(FitBitOAuthApi.FITBIT_API_URL);
   }
 
   @Provides @Singleton
@@ -80,7 +80,7 @@ public final class ApiModule {
   @Provides
   @Singleton
   OAuthService provideOAuthService() {
-    return new ServiceBuilder().provider(FitBitApi.class).
+    return new ServiceBuilder().provider(FitBitOAuthApi.class).
             apiKey(BuildConfig.APP_CLIENT_ID).
             apiSecret(BuildConfig.APP_SECRET).
             callback("fitwater://oauth_callback").
