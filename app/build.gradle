@@ -1,10 +1,10 @@
 apply plugin: 'android-sdk-manager'
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 apply plugin: 'hugo'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    buildToolsVersion "20"
 
     defaultConfig {
         minSdkVersion 16
