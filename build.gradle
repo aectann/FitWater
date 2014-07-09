@@ -8,6 +8,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:0.12.+'
         classpath 'com.jakewharton.hugo:hugo-plugin:+'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:+'
+        classpath 'org.robolectric:robolectric-gradle-plugin:0.11.+'
     }
 }
 
